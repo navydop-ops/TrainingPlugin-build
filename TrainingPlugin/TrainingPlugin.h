@@ -1,5 +1,4 @@
 #pragma once
-#pragma comment( lib, "BakkesMod.lib" )
 #include "bakkesmod/plugin/bakkesmodplugin.h"
 #include "JsonShot.h"
 
