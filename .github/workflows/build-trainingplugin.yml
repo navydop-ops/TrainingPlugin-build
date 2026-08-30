@@ -23,6 +23,19 @@ jobs:
           git clone https://github.com/bakkesmodorg/BakkesModSDK.git sdk
           git -C sdk checkout 479e8f571cf554b25f4eeb64d611dec4133edcaf
 
+      - name: Patch project
+        shell: pwsh
+        run: |
+          $p = "TrainingPlugin/TrainingPlugin.vcxproj"
+          $x = Get-Content $p -Raw
+          $x = $x.Replace('K:\bakkesmod\BakkesMod-rewrite\BakkesMod Rewrite', '$(GITHUB_WORKSPACE)\sdk\include')
+          $x = $x.Replace('K:\bakkesmod\BakkesMod-rewrite\x64\Release', '$(GITHUB_WORKSPACE)\sdk\lib')
+          $x = $x.Replace(
+            '<OptimizeReferences>true</OptimizeReferences>',
+            '<OptimizeReferences>true</OptimizeReferences><AdditionalDependencies>pluginsdk.lib;%(AdditionalDependencies)</AdditionalDependencies>'
+          )
+          Set-Content $p $x -Encoding UTF8
+
       - name: Build TrainingPlugin
         shell: pwsh
         run: |
@@ -30,10 +43,7 @@ jobs:
             /p:Configuration=Release `
             /p:Platform=x64 `
             /p:PlatformToolset=v143 `
-            /p:WindowsTargetPlatformVersion=10.0 `
-            /p:AdditionalIncludeDirectories="$env:GITHUB_WORKSPACE\sdk\include" `
-            /p:AdditionalLibraryDirectories="$env:GITHUB_WORKSPACE\sdk\lib" `
-            /p:AdditionalDependencies="pluginsdk.lib"
+            /p:WindowsTargetPlatformVersion=10.0
 
       - name: Find built DLL
         shell: pwsh
