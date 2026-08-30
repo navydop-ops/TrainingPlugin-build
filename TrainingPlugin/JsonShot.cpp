@@ -97,7 +97,7 @@ void JsonShot::init(GameWrapper* gw, CVarManagerWrapper* cons)
 			currentshot.options.shoot_on_ground = opt["shootonground"];
 		}
 		if (opt.count("script") > 0) {
-			currentshot.options.script = opt["script"];
+			currentshot.options.script = opt["script"].get<std::string>();
 		}
 	}
 
