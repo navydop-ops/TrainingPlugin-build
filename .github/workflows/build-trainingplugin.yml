@@ -1,27 +1,27 @@
-name: Build TrainingPlugin
-
-on:
-  push:
-    branches:
-      - trainingplugin-linux-build
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout plugin
-        uses: actions/checkout@v4
-
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
-
-      - name: Download BM218 SDK
+      - name: Patch project linker settings
         shell: pwsh
         run: |
-          git clone https://github.com/bakkesmodorg/BakkesModSDK.git sdk
-          git -C sdk checkout 479e8f571cf554b25f4eeb64d611dec4133edcaf
+          $project = "TrainingPlugin/TrainingPlugin.vcxproj"
+          $xml = Get-Content $project -Raw
+
+          $target = '<AdditionalLibraryDirectories>K:\bakkesmod\BakkesMod-rewrite\x64\Release</AdditionalLibraryDirectories>'
+
+          $replacement = @'
+          <AdditionalDependencies>pluginsdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
+              <AdditionalLibraryDirectories>$(GITHUB_WORKSPACE)\sdk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+'@
+
+          $xml = $xml.Replace(
+            $target,
+            $replacement.Trim()
+          )
+
+          $include = '<AdditionalIncludeDirectories>K:\bakkesmod\BakkesMod-rewrite\BakkesMod Rewrite</AdditionalIncludeDirectories>'
+          $includeReplacement = '<AdditionalIncludeDirectories>$(GITHUB_WORKSPACE)\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>'
+
+          $xml = $xml.Replace($include, $includeReplacement)
+
+          Set-Content $project $xml -Encoding UTF8
 
       - name: Build TrainingPlugin
         shell: pwsh
@@ -30,21 +30,4 @@ jobs:
             /p:Configuration=Release `
             /p:Platform=x64 `
             /p:PlatformToolset=v143 `
-            /p:WindowsTargetPlatformVersion=10.0 `
-            /p:AdditionalIncludeDirectories="$env:GITHUB_WORKSPACE\sdk\include" `
-            /p:AdditionalLibraryDirectories="$env:GITHUB_WORKSPACE\sdk\lib" `
-            /p:AdditionalDependencies="pluginsdk.lib;%(AdditionalDependencies)"
-
-      - name: Find built DLL
-        shell: pwsh
-        run: |
-          Get-ChildItem -Path . -Filter TrainingPlugin.dll -Recurse |
-            Select-Object -ExpandProperty FullName
-
-      - name: Upload TrainingPlugin.dll
-        uses: actions/upload-artifact@v4
-        with:
-          name: TrainingPlugin
-          path: |
-            TrainingPlugin/x64/Release/TrainingPlugin.dll
-            TrainingPlugin/Release/TrainingPlugin.dll
+            /p:WindowsTargetPlatformVersion=10.0
