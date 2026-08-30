@@ -11,7 +11,7 @@
 #include <cctype>
 #include <locale>
 #include <stdlib.h>
-#include "jsonshot.h"
+#include "JsonShot.h"
 #include "utils/parser.h"
 using namespace std;
 static bool is_number(char c)

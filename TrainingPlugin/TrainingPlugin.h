@@ -1,7 +1,7 @@
 #pragma once
 #pragma comment( lib, "BakkesMod.lib" )
 #include "bakkesmod/plugin/bakkesmodplugin.h"
-#include "jsonshot.h"
+#include "JsonShot.h"
 
 struct shot_data {
 	float ball_location_x = 0;

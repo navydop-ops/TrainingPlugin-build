@@ -1,12 +1,12 @@
-#include "trainingplugin.h"
+#include "TrainingPlugin.h"
 #include "cvareval.h"
 #include <math.h>
 
-#include "bakkesmod\wrappers\GameEvent\TutorialWrapper.h"
-#include "bakkesmod\wrappers\GameObject\PriWrapper.h"
-#include "bakkesmod\wrappers\GameObject\BallWrapper.h"
-#include "bakkesmod\wrappers\GameObject\CarWrapper.h"
-#include "bakkesmod\wrappers\ArrayWrapper.h"
+#include "bakkesmod/wrappers/GameEvent/TutorialWrapper.h"
+#include "bakkesmod/wrappers/GameObject/PriWrapper.h"
+#include "bakkesmod/wrappers/GameObject/BallWrapper.h"
+#include "bakkesmod/wrappers/GameObject/CarWrapper.h"
+#include "bakkesmod/wrappers/arraywrapper.h"
 BAKKESMOD_PLUGIN(TrainingPlugin, "Training plugin", "0.1.1", PLUGINTYPE_FREEPLAY | PLUGINTYPE_CUSTOM_TRAINING)
 
 void TrainingPlugin::get_shot_data_from_console(shot_data* data) {
