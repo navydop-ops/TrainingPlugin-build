@@ -20,38 +20,6 @@ jobs:
           git clone https://github.com/bakkesmodorg/BakkesModSDK.git sdk
           git -C sdk checkout 479e8f571cf554b25f4eeb64d611dec4133edcaf
 
-      - name: Patch project for CI
-        shell: pwsh
-        run: |
-          $project = "TrainingPlugin/TrainingPlugin.vcxproj"
-          $xml = Get-Content $project -Raw
-
-          $oldInclude = '<AdditionalIncludeDirectories>K:\bakkesmod\BakkesMod-rewrite\BakkesMod Rewrite</AdditionalIncludeDirectories>'
-          $newInclude = '<AdditionalIncludeDirectories>$(GITHUB_WORKSPACE)\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>'
-
-          $xml = $xml.Replace($oldInclude, $newInclude)
-
-          $oldLink = @'
-            <Link>
-              <EnableCOMDATFolding>true</EnableCOMDATFolding>
-              <OptimizeReferences>true</OptimizeReferences>
-              <AdditionalLibraryDirectories>K:\bakkesmod\BakkesMod-rewrite\x64\Release</AdditionalLibraryDirectories>
-            </Link>
-'@
-
-          $newLink = @'
-            <Link>
-              <EnableCOMDATFolding>true</EnableCOMDATFolding>
-              <OptimizeReferences>true</OptimizeReferences>
-              <AdditionalDependencies>pluginsdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
-              <AdditionalLibraryDirectories>$(GITHUB_WORKSPACE)\sdk\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-            </Link>
-'@
-
-          $xml = $xml.Replace($oldLink, $newLink)
-
-          Set-Content -Path $project -Value $xml -Encoding UTF8
-
       - name: Build TrainingPlugin
         shell: pwsh
         run: |
@@ -59,7 +27,10 @@ jobs:
             /p:Configuration=Release `
             /p:Platform=x64 `
             /p:PlatformToolset=v143 `
-            /p:WindowsTargetPlatformVersion=10.0
+            /p:WindowsTargetPlatformVersion=10.0 `
+            /p:AdditionalIncludeDirectories="$env:GITHUB_WORKSPACE\sdk\include" `
+            /p:AdditionalLibraryDirectories="$env:GITHUB_WORKSPACE\sdk\lib" `
+            /p:AdditionalDependencies="pluginsdk.lib;%(AdditionalDependencies)"
 
       - name: Find built DLL
         shell: pwsh
